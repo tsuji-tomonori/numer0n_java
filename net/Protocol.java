@@ -9,6 +9,7 @@ package net;
  */
 public enum Protocol {
 	name,
+	start,
 	call,
 	exit;
 }

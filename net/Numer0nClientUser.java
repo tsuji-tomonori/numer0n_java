@@ -23,9 +23,13 @@ public class Numer0nClientUser {
 	 */
 	public Numer0nClientUser(Socket socket) {
 		this.socket = socket;
-		Numer0nServerTask process = new Numer0nServerTask(getSocket());
+		Numer0nServerTask process = new Numer0nServerTask(getSocket(),this);
 		Thread thread = new Thread(process);
 		thread.start();
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

@@ -4,6 +4,7 @@
 package net;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
@@ -24,9 +25,10 @@ public class Numer0nServerTask implements Runnable {
 	 * コンストラクター
 	 * @param socket 接続するソケット
 	 */
-	public Numer0nServerTask(Socket socket) {
+	public Numer0nServerTask(Socket socket, Numer0nClientUser user) {
 		// TODO 自動生成されたコンストラクター・スタブ
 		this.socket = socket;
+		this.user = user;
 	}
 
 	/**
@@ -48,7 +50,7 @@ public class Numer0nServerTask implements Runnable {
 				// メッセージの処理
 				analyzeMessage(message);
 			}
-		}catch(Exception e) {
+		}catch(IOException e) {
 			// 切断
 			this.application.removeUser(user);
 			processingMessage(Protocol.exit,user.getName());
@@ -72,12 +74,15 @@ public class Numer0nServerTask implements Runnable {
 	private void processingMessage(Protocol pr, String value) {
 		switch(pr) {
 		case name:
-			System.out.println("name:"+value);
+			user.setName(value);
+			System.out.println("name:"+user.getName());
+			application.createRoom(user);
 			break;
 		default:
 			System.out.println("定義してません");
 			break;
 		}
 	}
+
 
 }

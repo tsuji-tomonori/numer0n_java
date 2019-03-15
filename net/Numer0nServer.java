@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * @author Tomonori Tsuji
@@ -21,6 +22,12 @@ public class Numer0nServer {
 	private ServerSocket server;
 	/** ゲームに参加している全ユーザーの動的配列 */
 	private ArrayList<Numer0nClientUser> userList = new ArrayList<>();
+	/** ゲーム中の部屋の動的配列 */
+	private ArrayList<Numer0nRoom> roomList = new ArrayList<>();
+	/** 部屋作成に使用する変数 部屋を作成する人数だけ人が集まったときtrue */
+	private boolean roomFlag = false;
+	/** 部屋に参加待ちのユーザー */
+	private Numer0nClientUser waitUser;
 
 	/**
 	 * メインメソッド
@@ -48,6 +55,7 @@ public class Numer0nServer {
 	 */
 	private Numer0nServer() {
 		userList = new ArrayList<Numer0nClientUser>();
+		roomList = new ArrayList<Numer0nRoom>();
 	}
 
 	/**
@@ -102,6 +110,71 @@ public class Numer0nServer {
 	 */
 	public void removeUser(Numer0nClientUser user) {
 		userList.remove(user);
+	}
+
+	/**
+	 * 部屋の追加
+	 * @param room 追加する部屋
+	 */
+	public void addRoomList(Numer0nRoom room) {
+		if(roomList.contains(room)) return;
+		roomList.add(room);
+	}
+
+	/**
+	 * 部屋情報の getter
+	 * @param i 配列番号
+	 * @return 部屋情報
+	 */
+	public Numer0nRoom getRoomList(int i) {
+		return roomList.get(i);
+	}
+
+	/**
+	 * 作成された部屋の数を返すメソッド
+	 * @return 作成された部屋の数
+	 */
+	public int roomListSize() {
+		return roomList.size();
+	}
+
+	/**
+	 * 指定した部屋を削除するメソッド
+	 * @param room 削除する部屋情報
+	 */
+	public void removeRoom(Numer0nRoom room) {
+		roomList.remove(room);
+	}
+
+	/**
+	 * 部屋を建てる
+	 * @param user 部屋に入るユーザー情報
+	 * @return 部屋を建てたかどうか true:部屋を建てた false:部屋を建てなかった
+	 */
+	public boolean createRoom(Numer0nClientUser user) {
+		// 待機ユーザーがいないとき
+		// もう１人部屋に入るまで待つ
+		if(!this.roomFlag) {
+			System.out.println("待機中:"+user.getName());
+			this.waitUser = user;
+			this.roomFlag = true;
+			return false;
+		}
+		// 待機ユーザーがいるとき
+		// 部屋を建てる
+		else {
+			// ユニークなIDを作成
+			UUID uuid = UUID.randomUUID();
+			// 部屋情報登録
+			addRoomList(new Numer0nRoom(uuid.toString(),waitUser,user));
+			// 参加者にゲーム開始通知
+			System.out.println(waitUser.getName());
+			sendMessage(waitUser,Protocol.start,user.getName());
+			sendMessage(user,Protocol.start,waitUser.getName());
+			System.out.println("部屋を建てました");
+			this.roomFlag = false;
+			return true;
+		}
 	}
 
 	/**
