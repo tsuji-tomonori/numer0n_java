@@ -34,7 +34,7 @@ public class Numer0nValue {
 	 * (チェックする場合はcheckメソッドを別途呼ぶこと)
 	 * @param value Numer0nの値
 	 */
-	public Numer0nValue(int[] value) {
+	public Numer0nValue(int... value) {
 		// 桁数チェック
 		if(value.length != DIGIT) throw new IllegalArgumentException("桁数が不適切です");
 		// 配列のコピー
@@ -47,6 +47,8 @@ public class Numer0nValue {
 		for(int i = 0; i < value.length();i++) {
 			this.value[i] = Integer.parseInt(""+value.charAt(i));
 		}
+		// 値のチェック
+		if(!check()) throw new IllegalArgumentException("桁の値が重複しています");
 	}
 
 	/**

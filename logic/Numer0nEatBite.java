@@ -79,6 +79,23 @@ public class Numer0nEatBite {
 	}
 
 	/**
+	 * nvFlag のgetter
+	 * Numer0n値を格納したかを表す
+	 * @return nvFlag値 true:格納 false:未格納
+	 */
+	public boolean getNvFlag() {
+		return this.nvFlag;
+	}
+
+	/**
+	 * nv のgetter
+	 * @return nv
+	 */
+	public Numer0nValue getNv() {
+		return this.nv;
+	}
+
+	/**
 	 * eatBiteの値をStringに変換したもの
 	 */
 	public String toString() {
@@ -118,8 +135,13 @@ public class Numer0nEatBite {
 		return this.eatBite;
 	}
 
+	/**
+	 * 初期化
+	 */
 	private void init() {
 		Arrays.fill(this.eatBite, 0);
 	}
+
+
 
 }
