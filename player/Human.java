@@ -19,8 +19,12 @@ public class Human implements IPlayer{
 	Scanner sc = new Scanner(System.in);
 
 	public Human() {
-		System.out.println("ユーザー名を入力してください");
+		System.out.println("ユーザー名を入力してください:");
 		this.name = sc.nextLine();
+	}
+
+	public Human(String name) {
+		this.name = name;
 	}
 
 	@Override

@@ -9,6 +9,8 @@ package net;
  */
 public enum Protocol {
 	name,
+	reqPreProcessing,
+	resPreProcessing,
 	start,
 	call,
 	exit;

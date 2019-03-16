@@ -53,30 +53,38 @@ public class Numer0nServerTask implements Runnable {
 		}catch(IOException e) {
 			// 切断
 			this.application.removeUser(user);
-			processingMessage(Protocol.exit,user.getName());
+			processingMessage(Protocol.exit,user.getName(),"");
 		}
 
 	}
 
 	private void analyzeMessage(String message) {
-		String[] buff = message.split(",",2);
+		String[] buff = message.split(",",3);
 		String protocol = buff[0];
-		String value;
-		if(buff.length < 2){
-			value = "";
+		String value = buff[1];
+		String id;
+		if(buff.length < 3){
+			id = "";
 		}
 		else{
-			value = buff[1];
+			id = buff[2];
 		}
-		processingMessage(Protocol.valueOf(protocol),value);
+		processingMessage(Protocol.valueOf(protocol),value,id);
 	}
 
-	private void processingMessage(Protocol pr, String value) {
+	private void processingMessage(Protocol pr, String value, String id) {
+		System.out.println(">("+user.getName()+")"+pr+" : "+value+" : "+id);
 		switch(pr) {
 		case name:
 			user.setName(value);
 			System.out.println("name:"+user.getName());
 			application.createRoom(user);
+			break;
+		case resPreProcessing:
+			System.out.println("room res:"+id);
+			application.getRoomList(id).setPreProcessing(user);
+			if(application.getRoomList(id).isPreProcessing())
+				application.sendMessageToRoom(application.getRoomList(id), Protocol.start, "", "");
 			break;
 		default:
 			System.out.println("定義してません");

@@ -11,6 +11,9 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import player.Human;
+import player.IPlayer;
+
 /**
  * @author Tomonori Tsuji
  * @since 2019/03/10
@@ -25,6 +28,10 @@ public class Numer0nClientTask{
 	private int portNumber;
 	/** ユーザ名 */
 	private String name;
+	/** 部屋ID */
+	private String id;
+	/***/
+	private IPlayer player;
 
 	public Numer0nClientTask(Socket socket, String name, String ipAddress, int portNumber) {
 		// TODO 自動生成されたコンストラクター・スタブ
@@ -70,24 +77,37 @@ public class Numer0nClientTask{
 	}
 
 	private void analyzeMessage(String message) {
-		String[] buff = message.split(",",2);
+		String[] buff = message.split(",",3);
 		String protocol = buff[0];
-		String value;
-		if(buff.length < 2){
-			value = "";
+		String value = buff[1];
+		String id;
+		if(buff.length < 3){
+			id = "";
 		}
 		else{
-			value = buff[1];
+			id = buff[2];
 		}
-		processingMessage(Protocol.valueOf(protocol),value);
+		processingMessage(Protocol.valueOf(protocol),value,id);
 	}
 
-	private void processingMessage(Protocol pr, String value) {
-		System.out.print(value);
+	private void processingMessage(Protocol pr, String value, String id) {
+		System.out.println(">"+pr+" : "+value+" : "+id);
 		switch(pr) {
 			case name:
-				sendMessage(Protocol.name,this.name);
-				System.out.println("send name");
+				sendMessage(Protocol.name,this.name,"");
+				System.out.println("サーバに接続しました");
+				break;
+			case reqPreProcessing:
+				this.id = id;
+				System.out.println("部屋ID" + this.id);
+				player = new Human(this.name);
+				player.preprocessing();
+				sendMessage(Protocol.resPreProcessing,"",this.id);
+				System.out.println("対戦相手:"+value);
+				System.out.println("準備中...");
+				break;
+			case start:
+				System.out.println("game start");
 				break;
 			default:
 				System.out.println("定義してません");
@@ -100,16 +120,17 @@ public class Numer0nClientTask{
 	 * メッセージ送信
 	 * @param message 送信内容
 	 * */
-	public void sendMessage(Protocol pr, String value){
+	public void sendMessage(Protocol pr, String value, String id){
 		// 接続されたソケットの出力ストリームを取得し，データ出力ストリームを連結
 		OutputStream os = null;
 		try {
 			os = this.socket.getOutputStream();
 			DataOutputStream dos = new DataOutputStream(os);
 			// データの送信（ソケットへ書き出す）
-			String message = pr + "," + value;
+			String message = pr + "," + value + "," + id;
 			dos.writeUTF(message);
 			dos.flush();
+			System.out.println("<"+pr+" : "+value+" : "+id);
 		} catch (IOException e) {
 			// TODO 自動生成された catch ブロック
 			//e.printStackTrace();

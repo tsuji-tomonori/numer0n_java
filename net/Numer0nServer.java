@@ -71,7 +71,7 @@ public class Numer0nServer {
 				// 新しいクライアントが接続したらユーザーオブジェクトを作成する
 				Numer0nClientUser user = new Numer0nClientUser(client);
 				addUser(user);
-				sendMessage(user,Protocol.name,"接続完了");
+				sendMessage(user,Protocol.name,"接続完了","");
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -119,6 +119,15 @@ public class Numer0nServer {
 	public void addRoomList(Numer0nRoom room) {
 		if(roomList.contains(room)) return;
 		roomList.add(room);
+		System.out.println("room add:"+room.getRoomID());
+	}
+
+	public Numer0nRoom getRoomList(String roomID) {
+		for(int i = 0; i < roomListSize(); i++) {
+			if(getRoomList(i).getRoomID().equals(roomID))
+				return getRoomList(i);
+		}
+		throw new IllegalArgumentException("部屋が見つかりません");
 	}
 
 	/**
@@ -166,15 +175,20 @@ public class Numer0nServer {
 			// ユニークなIDを作成
 			UUID uuid = UUID.randomUUID();
 			// 部屋情報登録
-			addRoomList(new Numer0nRoom(uuid.toString(),waitUser,user));
+			Numer0nRoom room = new Numer0nRoom(uuid.toString(),waitUser,user);
+			addRoomList(room);
 			// 参加者にゲーム開始通知
-			System.out.println(waitUser.getName());
-			sendMessage(waitUser,Protocol.start,user.getName());
-			sendMessage(user,Protocol.start,waitUser.getName());
-			System.out.println("部屋を建てました");
+			sendMessage(waitUser,Protocol.reqPreProcessing,user.getName(),room.getRoomID());
+			sendMessage(user,Protocol.reqPreProcessing,waitUser.getName(),room.getRoomID());
+			System.out.println("部屋を建てました:"+room.getRoomID());
 			this.roomFlag = false;
 			return true;
 		}
+	}
+
+	public void sendMessageToRoom(Numer0nRoom room, Protocol pr, String value, String id) {
+		sendMessage(room.getFirst(),pr,value,id);
+		sendMessage(room.getLate(),pr,value,id);
 	}
 
 	/**
@@ -182,16 +196,17 @@ public class Numer0nServer {
 	 * @param user 送信相手のNumer0nClientUser変数
 	 * @param message 送信内容
 	 */
-	public void sendMessage(Numer0nClientUser user, Protocol pr, String value) {
+	public void sendMessage(Numer0nClientUser user, Protocol pr, String value, String id) {
 		try {
 			// 接続されたソケットの出力ストリームを取得し, データ出力ストリームを連結
 			OutputStream os = user.getSocket().getOutputStream();
 			DataOutputStream dos = new DataOutputStream(os);
 
 			// 送信
-			String message = pr + "," + value;
+			String message = pr + "," + value + "," + id;
 			dos.writeUTF(message);
 			dos.flush();
+			System.out.println("<("+user.getName()+")"+pr+" : "+value+" : "+id);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
