@@ -12,6 +12,11 @@ public enum Protocol {
 	reqPreProcessing,
 	resPreProcessing,
 	start,
-	call,
+	reqCall,
+	resCall,
+	reqDiv,
+	resDiv,
+	info,
+	fin,
 	exit;
 }

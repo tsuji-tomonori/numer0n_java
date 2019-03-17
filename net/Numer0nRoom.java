@@ -11,6 +11,7 @@ public class Numer0nRoom {
 	private int FIRST = 0;
 	private int LATE = 1;
 	private int isPreProcessing = 0;
+	private int nextAttacker = FIRST;
 
 	public Numer0nRoom(String roomNumber, Numer0nClientUser first, Numer0nClientUser late) {
 		this.roomID = roomNumber;
@@ -46,6 +47,21 @@ public class Numer0nRoom {
 		if(this.flag[isPreProcessing][FIRST] && this.flag[isPreProcessing][LATE])
 			return true;
 		else return false;
+	}
+
+	public Numer0nClientUser whoAttacker() {
+		if(nextAttacker == FIRST) {
+			nextAttacker = LATE;
+			return first;
+		}else {
+			nextAttacker = FIRST;
+			return late;
+		}
+	}
+
+	public Numer0nClientUser whoDiver() {
+		if(nextAttacker == FIRST) return first;
+		else return late;
 	}
 
 	private int divUser(Numer0nClientUser user) {

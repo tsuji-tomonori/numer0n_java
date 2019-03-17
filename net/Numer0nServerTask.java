@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
+import logic.Numer0nEatBite;
+
 /**
  * @author Tomonori Tsuji
  * @since 2019/03/07
@@ -83,8 +85,21 @@ public class Numer0nServerTask implements Runnable {
 		case resPreProcessing:
 			System.out.println("room res:"+id);
 			application.getRoomList(id).setPreProcessing(user);
-			if(application.getRoomList(id).isPreProcessing())
+			if(application.getRoomList(id).isPreProcessing()) {
 				application.sendMessageToRoom(application.getRoomList(id), Protocol.start, "", "");
+				application.sendMessage(application.getRoomList(id).whoAttacker(), Protocol.reqCall, "","");
+			}
+			break;
+		case resCall:
+			application.sendMessageToRoom(application.getRoomList(id), Protocol.info, "call:"+value, "");
+			application.sendMessage(application.getRoomList(id).whoDiver(), Protocol.reqDiv, value, "");
+			break;
+		case resDiv:
+			application.sendMessageToRoom(application.getRoomList(id), Protocol.info, "div:"+value, "");
+			if(new Numer0nEatBite(value).finFlag())
+				application.sendMessageToRoom(application.getRoomList(id), Protocol.fin, "", "");
+			else
+				application.sendMessage(application.getRoomList(id).whoAttacker(), Protocol.reqCall, "","");
 			break;
 		default:
 			System.out.println("定義してません");

@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import logic.Numer0nEatBite;
+import logic.Numer0nValue;
 import player.Human;
 import player.IPlayer;
 
@@ -32,6 +34,8 @@ public class Numer0nClientTask{
 	private String id;
 	/***/
 	private IPlayer player;
+	/** EatBite */
+	private Numer0nEatBite eb = new Numer0nEatBite();
 
 	public Numer0nClientTask(Socket socket, String name, String ipAddress, int portNumber) {
 		// TODO 自動生成されたコンストラクター・スタブ
@@ -100,14 +104,26 @@ public class Numer0nClientTask{
 			case reqPreProcessing:
 				this.id = id;
 				System.out.println("部屋ID" + this.id);
-				player = new Human(this.name);
-				player.preprocessing();
+				this.player = new Human(this.name);
+				this.player.preprocessing();
 				sendMessage(Protocol.resPreProcessing,"",this.id);
 				System.out.println("対戦相手:"+value);
 				System.out.println("準備中...");
 				break;
 			case start:
 				System.out.println("game start");
+				break;
+			case reqCall:
+				sendMessage(Protocol.resCall,this.player.call(this.eb).toValue(),this.id);
+				break;
+			case reqDiv:
+				sendMessage(Protocol.resDiv,player.div(new Numer0nValue(value)).toValue(),this.id);
+				break;
+			case info:
+				System.out.println("info:"+value);
+				break;
+			case fin:
+				System.out.println("fin");
 				break;
 			default:
 				System.out.println("定義してません");

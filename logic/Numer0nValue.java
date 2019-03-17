@@ -51,6 +51,8 @@ public class Numer0nValue {
 		if(!check()) throw new IllegalArgumentException("桁の値が重複しています");
 	}
 
+
+
 	/**
 	 * Numer0nに適した値かチェックする
 	 * 重複のチェック
@@ -111,4 +113,13 @@ public class Numer0nValue {
 	public String toString() {
 		return Arrays.toString(value);
 	}
+
+	public String toValue() {
+		String str = "";
+		for(int i=0; i < this.value.length;i++) {
+			str += String.valueOf(this.value[i]);
+		}
+		return str;
+	}
+
 }

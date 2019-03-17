@@ -27,6 +27,13 @@ public class Numer0nEatBite {
 		init();
 	}
 
+	public Numer0nEatBite(String eatBite) {
+		if(eatBite.length() != 2) throw new IllegalArgumentException("入力値が不正です");
+		for(int i = 0; i < this.eatBite.length;i++) {
+			this.eatBite[i] = Integer.parseInt(""+eatBite.charAt(i));
+		}
+	}
+
 	/**
 	 * コンストラクター
 	 * 事前にNumer0nValue を持っている場合, それを保持する
@@ -100,6 +107,14 @@ public class Numer0nEatBite {
 	 */
 	public String toString() {
 		return Arrays.toString(eatBite);
+	}
+
+	public String toValue() {
+		String str = "";
+		for(int i=0; i < this.eatBite.length;i++) {
+			str += String.valueOf(this.eatBite[i]);
+		}
+		return str;
 	}
 
 	/**
